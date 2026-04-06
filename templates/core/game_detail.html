@@ -1,0 +1,74 @@
+{% extends 'core/base.html' %}
+
+{% block title %}{{ game.title }}{% endblock %}
+
+{% block content %}
+<article class="game-detail">
+    <!-- Обложка и инфо -->
+    <div class="game-detail__header">
+        <div class="game-detail__image">
+            {% if game.logo %}
+                <img src="{{ game.logo.url }}" alt="{{ game.title }}">
+            {% else %}
+                <div class="no-image no-image--large">🎮</div>
+            {% endif %}
+        </div>
+        <div class="game-detail__info">
+            <h1>{{ game.title }}</h1>
+            <p class="text-muted">{{ game.developer }} • {{ game.release_year }}</p>
+            <div class="game-detail__meta">
+                <span><strong>Движок:</strong> {{ game.get_engine_display }}</span>
+                <span><strong>Оценка:</strong> ⭐ {{ game.rating }}/10</span>
+                <span><strong>Прогресс:</strong> {{ game.save_progress }}%</span>
+                {% if game.purchase_date %}
+                    <span><strong>Куплено:</strong> {{ game.purchase_date|date:"d.m.Y" }}</span>
+                {% endif %}
+            </div>
+            <div class="game-detail__actions">
+                <a href="{% url 'core:game_update' game.pk %}" class="btn btn--primary">✏️ Редактировать</a>
+                <a href="{% url 'core:game_delete' game.pk %}" class="btn btn--danger">🗑️ Удалить</a>
+                <a href="{% url 'core:character_create' %}?game={{ game.pk }}" class="btn btn--secondary">+ Добавить персонажа</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Персонажи игры -->
+    <section class="characters-section">
+        <h2>🎭 3D-персонажи ({{ characters.count }})</h2>
+        
+        {% if characters %}
+            <div class="characters-grid">
+                {% for character in characters %}
+                    <article class="character-card">
+                        <div class="character-card__image">
+                            {% if character.thumbnail %}
+                                <img src="{{ character.thumbnail.url }}" alt="{{ character.name }}">
+                            {% else %}
+                                <div class="no-image">👤</div>
+                            {% endif %}
+                        </div>
+                        <div class="character-card__content">
+                            <h3>{{ character.name }}</h3>
+                            <p class="character-card__role">{{ character.get_role_display }}</p>
+                            <ul class="character-card__stats">
+                                <li>Полигоны: {{ character.polygon_count|intcomma }}</li>
+                                <li>Текстуры: {{ character.get_texture_resolution_display }}</li>
+                                <li>Риг: {% if character.has_rig %}✅{% else %}❌{% endif %}</li>
+                            </ul>
+                            {% if character.notes %}
+                                <p class="character-card__notes">{{ character.notes|truncatewords:15 }}</p>
+                            {% endif %}
+                            <div class="character-card__actions">
+                                <a href="{% url 'core:character_update' character.pk %}" class="btn btn--small">✏️</a>
+                                <a href="{% url 'core:character_delete' character.pk %}" class="btn btn--small btn--danger">🗑️</a>
+                            </div>
+                        </div>
+                    </article>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p>Пока нет персонажей. <a href="{% url 'core:character_create' %}?game={{ game.pk }}">Добавить первого?</a></p>
+        {% endif %}
+    </section>
+</article>
+{% endblock %}

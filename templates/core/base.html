@@ -1,0 +1,51 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Game Library{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Навигация -->
+    <header class="navbar">
+        <div class="container navbar__content">
+            <a href="{% url 'core:game_list' %}" class="navbar__logo">🎮 GameLib</a>
+            <nav class="navbar__menu">
+                <a href="{% url 'core:game_list' %}">Все игры</a>
+                <a href="{% url 'core:game_create' %}" class="btn btn--primary">+ Добавить игру</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Сообщения Django -->
+    <div class="container">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert--{{ message.tags }}">
+                    {{ message }}
+                    <button class="alert__close" onclick="this.parentElement.remove()">×</button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+
+    <!-- Основной контент -->
+    <main class="container main-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Футер -->
+    <footer class="footer">
+        <div class="container">
+            <p>© 2024 Game Library • Django Project</p>
+        </div>
+    </footer>
+
+    <!-- Скрипты -->
+    <script src="{% static 'js/main.js' %}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

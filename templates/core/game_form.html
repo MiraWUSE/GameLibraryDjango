@@ -1,0 +1,46 @@
+{% extends 'core/base.html' %}
+
+{% block title %}{% if form.instance.pk %}Редактировать{% else %}Добавить{% endif %} игру{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <h1>{% if form.instance.pk %}✏️ Редактировать{% else %}+ Добавить{% endif %} игру</h1>
+    
+    <form method="post" enctype="multipart/form-data" class="game-form">
+        {% csrf_token %}
+        
+        {% if form.non_field_errors %}
+            <div class="alert alert--error">
+                {{ form.non_field_errors }}
+            </div>
+        {% endif %}
+
+        {% for field in form %}
+            <div class="form-group">
+                <label for="{{ field.id_for_label }}">
+                    {{ field.label }}
+                    {% if field.field.required %}<span class="required">*</span>{% endif %}
+                </label>
+                
+                {{ field }}
+                
+                {% if field.help_text %}
+                    <small class="help-text">{{ field.help_text }}</small>
+                {% endif %}
+                
+                {% if field.errors %}
+                    <div class="error-list">
+                        {{ field.errors }}
+                    </div>
+                {% endif %}
+            </div>
+        {% endfor %}
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn--primary btn--large">💾 Сохранить</button>
+            <a href="{% if form.instance.pk %}{% url 'core:game_detail' form.instance.pk %}{% else %}{% url 'core:game_list' %}{% endif %}" 
+               class="btn btn--secondary">↩️ Отмена</a>
+        </div>
+    </form>
+</div>
+{% endblock %}
