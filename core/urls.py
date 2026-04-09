@@ -1,5 +1,7 @@
 from django.urls import path
 from . import views
+from django.conf import settings
+from django.conf.urls.static import static
 
 app_name = 'core'
 
@@ -19,3 +21,6 @@ urlpatterns = [
     # AJAX
     path('ajax/filter-games/', views.ajax_filter_games, name='ajax_filter_games'),
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

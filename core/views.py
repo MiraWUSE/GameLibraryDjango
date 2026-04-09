@@ -8,6 +8,7 @@ from .models import LibraryGame, Character3D
 from .forms import LibraryGameForm, Character3DForm
 
 
+# === ИГРЫ ===
 class GameListView(ListView):
     model = LibraryGame
     template_name = 'core/game_list.html'
@@ -17,24 +18,14 @@ class GameListView(ListView):
     def get_queryset(self):
         queryset = super().get_queryset()
         search = self.request.GET.get('search', '')
-        engine = self.request.GET.get('engine', '')
-        min_rating = self.request.GET.get('min_rating', '')
-        status = self.request.GET.get('status', '')
-
         if search:
-            queryset = queryset.filter(Q(title__icontains=search) | Q(developer__icontains=search))
-        if engine:
-            queryset = queryset.filter(engine=engine)
-        if min_rating:
-            queryset = queryset.filter(rating__gte=min_rating)
-        if status:
-            queryset = queryset.filter(save_progress__gte=status)
-        
+            queryset = queryset.filter(
+                Q(title__icontains=search) | Q(developer__icontains=search)
+            )
         return queryset
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['engines'] = LibraryGame._meta.get_field('engine').choices
         context['current_filters'] = self.request.GET.dict()
         return context
 
@@ -54,10 +45,10 @@ class GameCreateView(CreateView):
     model = LibraryGame
     form_class = LibraryGameForm
     template_name = 'core/game_form.html'
-    success_url = reverse_lazy('core:game_list') 
+    success_url = reverse_lazy('core:game_list')
 
     def form_valid(self, form):
-        messages.success(self.request, f'Игра «{form.instance.title}» успешно добавлена!')
+        messages.success(self.request, f'Игра "{form.instance.title}" успешно добавлена!')
         return super().form_valid(form)
 
 
@@ -65,21 +56,21 @@ class GameUpdateView(UpdateView):
     model = LibraryGame
     form_class = LibraryGameForm
     template_name = 'core/game_form.html'
-    success_url = reverse_lazy('core:game_list')  # ← ИСПРАВЛЕНО
+    success_url = reverse_lazy('core:game_list')
 
     def form_valid(self, form):
-        messages.success(self.request, f'Игра «{form.instance.title}» обновлена!')
+        messages.success(self.request, f'Игра "{form.instance.title}" обновлена!')
         return super().form_valid(form)
 
 
 class GameDeleteView(DeleteView):
     model = LibraryGame
     template_name = 'core/game_confirm_delete.html'
-    success_url = reverse_lazy('core:game_list')  # ← ИСПРАВЛЕНО
+    success_url = reverse_lazy('core:game_list')
 
     def delete(self, request, *args, **kwargs):
         game_name = self.get_object().title
-        messages.warning(request, f'Игра «{game_name}» удалена.')
+        messages.warning(request, f'Игра "{game_name}" удалена.')
         return super().delete(request, *args, **kwargs)
 
 
@@ -89,8 +80,22 @@ class CharacterCreateView(CreateView):
     form_class = Character3DForm
     template_name = 'core/character_form.html'
 
+    def get_initial(self):
+        initial = super().get_initial()
+        game_id = self.request.GET.get('game')
+        if game_id:
+            initial['game'] = game_id
+        return initial
+
+    def form_valid(self, form):
+        if form.instance.game_id is None:
+            game_id = self.request.GET.get('game') or self.request.POST.get('game')
+            if game_id:
+                form.instance.game_id = game_id
+        return super().form_valid(form)
+
     def get_success_url(self):
-        messages.success(self.request, f'Персонаж «{self.object.name}» добавлен!')
+        messages.success(self.request, f'Персонаж "{self.object.name}" добавлен!')
         return reverse_lazy('core:game_detail', kwargs={'pk': self.object.game_id})
 
 
@@ -99,9 +104,17 @@ class CharacterUpdateView(UpdateView):
     form_class = Character3DForm
     template_name = 'core/character_form.html'
 
+    def form_valid(self, form):
+        if form.instance.game_id is None:
+            original = Character3D.objects.get(pk=self.object.pk)
+            if original.game_id:
+                form.instance.game_id = original.game_id
+        
+        messages.success(self.request, f'Персонаж "{self.object.name}" обновлён!')
+        return super().form_valid(form)
+
     def get_success_url(self):
-        messages.success(self.request, f'Персонаж «{self.object.name}» обновлён!')
-        return reverse_lazy('core:game_detail', kwargs={'pk': self.object.game_id}) 
+        return reverse_lazy('core:game_detail', kwargs={'pk': self.object.game_id})
 
 
 class CharacterDeleteView(DeleteView):
@@ -110,42 +123,35 @@ class CharacterDeleteView(DeleteView):
 
     def get_success_url(self):
         messages.warning(self.request, 'Персонаж удалён.')
-        return reverse_lazy('core:game_detail', kwargs={'pk': self.object.game_id})  
+        return reverse_lazy('core:game_detail', kwargs={'pk': self.object.game_id})
 
-# === AJAX: Динамический поиск и фильтрация ===
+
+# === AJAX: Поиск по названию ===
 def ajax_filter_games(request):
-    """Обработчик AJAX-запросов для фильтрации без перезагрузки"""
     search = request.GET.get('search', '')
-    engine = request.GET.get('engine', '')
-    min_rating = request.GET.get('min_rating', '')
-
     games = LibraryGame.objects.all()
-
     if search:
-        games = games.filter(Q(title__icontains=search) | Q(developer__icontains=search))
-    if engine:
-        games = games.filter(engine=engine)
-    if min_rating:
-        games = games.filter(rating__gte=min_rating)
+        games = games.filter(
+            Q(title__icontains=search) | Q(developer__icontains=search)
+        )
 
-    # Формируем HTML-карточки для возврата
     html = ''
     for game in games:
+        logo_html = f'<img src="{game.logo.url}" alt="{game.title}">' if game.logo else '<div class="no-image">нет картинки</div>'
         html += f'''
         <div class="game-card" data-game-id="{game.id}">
             <div class="game-card__image">
-                {'<img src="' + game.logo.url + '" alt="' + game.title + '">' if game.logo else '<div class="no-image">Нет обложки</div>'}
+                {logo_html}
             </div>
             <div class="game-card__content">
                 <h3><a href="{game.get_absolute_url()}">{game.title}</a></h3>
                 <p class="game-card__meta">{game.get_engine_display()} • {game.release_year}</p>
-                <p class="game-card__rating">⭐ {game.rating}/10</p>
+                <p class="game-card__rating">Оценка: {game.rating}/10</p>
                 <p class="game-card__progress">Прогресс: {game.save_progress}%</p>
             </div>
         </div>
         '''
-    
     if not html:
-        html = '<p class="no-results">Ничего не найдено 😔</p>'
+        html = '<p class="no-results">Ничего не найдено</p>'
 
     return JsonResponse({'html': html, 'count': games.count()})

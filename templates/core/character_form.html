@@ -1,10 +1,11 @@
 {% extends 'core/base.html' %}
+{% load humanize %}
 
-{% block title %}{% if form.instance.pk %}Редактировать{% else %}Добавить{% endif %} игру{% endblock %}
+{% block title %}{% if form.instance.pk %}Редактировать{% else %}Добавить{% endif %} персонажа{% endblock %}
 
 {% block content %}
 <div class="form-container">
-    <h1>{% if form.instance.pk %}Редактировать{% else %}Добавить{% endif %} игру</h1>
+    <h1>{% if form.instance.pk %}Редактировать{% else %}Добавить{% endif %} 3D-персонажа</h1>
     
     <form method="post" enctype="multipart/form-data" class="game-form">
         {% csrf_token %}
@@ -38,7 +39,7 @@
 
         <div class="form-actions">
             <button type="submit" class="btn btn--primary btn--large">Сохранить</button>
-            <a href="{% if form.instance.pk %}{% url 'core:game_detail' form.instance.pk %}{% else %}{% url 'core:game_list' %}{% endif %}" 
+            <a href="{% if form.instance.pk %}{% url 'core:game_detail' form.instance.game.pk %}{% else %}{% url 'core:game_list' %}{% endif %}" 
                class="btn btn--secondary">Отмена</a>
         </div>
     </form>

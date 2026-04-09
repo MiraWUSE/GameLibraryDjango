@@ -1,4 +1,3 @@
-/* ===== Базовые настройки ===== */
 :root {
     --color-primary: #6c5ce7;
     --color-primary-dark: #5b4cdb;
@@ -48,6 +47,7 @@ body {
     justify-content: space-between;
     align-items: center;
     padding: 1rem 20px;
+    gap: 1rem;
 }
 
 .navbar__logo {
@@ -55,12 +55,38 @@ body {
     font-weight: bold;
     color: var(--color-primary);
     text-decoration: none;
+    white-space: nowrap;
+}
+
+.navbar__search {
+    display: flex;
+    gap: 0.5rem;
+    flex: 1;
+    max-width: 500px;
+    margin: 0 1rem;
+}
+
+.navbar__search-input {
+    flex: 1;
+    min-width: 150px;
+    padding: 0.6rem 0.8rem;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    transition: var(--transition);
+}
+
+.navbar__search-input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.1);
 }
 
 .navbar__menu {
     display: flex;
     gap: 1rem;
     align-items: center;
+    white-space: nowrap;
 }
 
 .navbar__menu a {
@@ -85,6 +111,7 @@ body {
     cursor: pointer;
     transition: var(--transition);
     text-align: center;
+    font-size: 0.95rem;
 }
 
 .btn--primary {
@@ -101,14 +128,31 @@ body {
     color: var(--color-text);
 }
 
+.btn--secondary:hover {
+    background: #8e84fc;
+}
+
+.btn--success {
+    background: var(--color-success);
+    color: white;
+}
+
+.btn--success:hover {
+    background: #00a383;
+}
+
 .btn--danger {
     background: var(--color-danger);
     color: white;
 }
 
+.btn--danger:hover {
+    background: #c0392b;
+}
+
 .btn--small {
-    padding: 0.3rem 0.8rem;
-    font-size: 0.9rem;
+    padding: 0.4rem 0.9rem;
+    font-size: 0.85rem;
 }
 
 .btn--large {
@@ -128,14 +172,40 @@ body {
 }
 
 @keyframes slideIn {
-    from { opacity: 0; transform: translateY(-10px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
-.alert--success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
-.alert--error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
-.alert--warning { background: #fff3cd; color: #856404; border: 1px solid #ffeaa7; }
-.alert--info { background: #cce5ff; color: #004085; border: 1px solid #b8daff; }
+.alert--success {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.alert--error {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.alert--warning {
+    background: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeaa7;
+}
+
+.alert--info {
+    background: #cce5ff;
+    color: #004085;
+    border: 1px solid #b8daff;
+}
 
 .alert__close {
     background: none;
@@ -146,40 +216,18 @@ body {
     opacity: 0.7;
 }
 
-.alert__close:hover { opacity: 1; }
-
-/* ===== Фильтры ===== */
-.filters {
-    background: var(--color-card);
-    padding: 1.5rem;
-    border-radius: var(--border-radius);
-    box-shadow: var(--shadow);
-    margin-bottom: 2rem;
+.alert__close:hover {
+    opacity: 1;
 }
 
-.filter-group {
-    margin-bottom: 1rem;
+/* ===== Заголовок страницы ===== */
+.page-header {
+    margin: 2rem 0 1.5rem;
 }
 
-.filter-group label {
-    display: block;
+.page-header h1 {
     margin-bottom: 0.5rem;
-    font-weight: 500;
-}
-
-.form-control {
-    width: 100%;
-    padding: 0.7rem;
-    border: 2px solid #e0e0e0;
-    border-radius: 8px;
-    font-size: 1rem;
-    transition: var(--transition);
-}
-
-.form-control:focus {
-    outline: none;
-    border-color: var(--color-primary);
-    box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.1);
+    color: var(--color-text);
 }
 
 /* ===== Сетка игр ===== */
@@ -187,6 +235,7 @@ body {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 1.5rem;
+    margin-bottom: 2rem;
 }
 
 .game-card {
@@ -218,12 +267,20 @@ body {
 }
 
 .no-image {
-    font-size: 3rem;
-    color: #999;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f0f0f0;
+    color: #666;
+    font-size: 0.95rem;
+    text-align: center;
+    padding: 0.5rem;
 }
 
 .no-image--large {
-    font-size: 5rem;
+    font-size: 1.1rem;
     height: 250px;
 }
 
@@ -233,6 +290,7 @@ body {
 
 .game-card__content h3 {
     margin-bottom: 0.5rem;
+    font-size: 1.2rem;
 }
 
 .game-card__content h3 a {
@@ -242,6 +300,17 @@ body {
 
 .game-card__content h3 a:hover {
     color: var(--color-primary);
+}
+
+.game-card__title {
+    color: var(--color-primary) !important;
+    text-decoration: underline;
+    font-weight: 600;
+}
+
+.game-card__title:hover {
+    color: var(--color-primary-dark) !important;
+    text-decoration: none;
 }
 
 .game-card__meta {
@@ -265,23 +334,35 @@ body {
 .game-card__actions {
     display: flex;
     gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.game-card__actions .btn {
+    flex: 1;
+    min-width: 100px;
 }
 
 /* ===== Детальная страница ===== */
+.game-detail {
+    margin: 2rem 0;
+}
+
 .game-detail__header {
     display: grid;
-    grid-template-columns: 250px 1fr;
-    gap: 2rem;
+    grid-template-columns: 300px 1fr;
+    gap: 2.5rem;
     background: var(--color-card);
     padding: 2rem;
     border-radius: var(--border-radius);
     box-shadow: var(--shadow);
-    margin-bottom: 2rem;
+    margin-bottom: 2.5rem;
+    align-items: start;
 }
 
 .game-detail__image {
     border-radius: var(--border-radius);
     overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
 .game-detail__image img {
@@ -292,27 +373,59 @@ body {
 
 .game-detail__info h1 {
     margin-bottom: 0.5rem;
+    font-size: 2.2rem;
+    color: var(--color-text);
 }
 
 .game-detail__meta {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 0.5rem 1rem;
-    margin: 1rem 0;
+    gap: 0.8rem 1.5rem;
+    margin: 1.5rem 0;
+    padding: 1.5rem;
+    background: var(--color-bg);
+    border-radius: 8px;
+}
+
+.game-detail__meta span {
+    display: block;
+    font-size: 0.95rem;
+}
+
+.game-detail__meta strong {
+    color: var(--color-text);
+    margin-right: 0.3rem;
 }
 
 .game-detail__actions {
     display: flex;
     gap: 1rem;
-    margin-top: 1.5rem;
+    margin-top: 2rem;
+    flex-wrap: wrap;
+}
+
+.game-detail__actions .btn {
+    flex: 1;
+    min-width: 150px;
 }
 
 /* ===== Персонажи ===== */
+.characters-section {
+    margin-top: 3rem;
+}
+
+.characters-section h2 {
+    margin-bottom: 1.5rem;
+    color: var(--color-text);
+    font-size: 1.8rem;
+    padding-bottom: 0.8rem;
+    border-bottom: 2px solid var(--color-primary);
+}
+
 .characters-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 1.2rem;
-    margin-top: 1rem;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
 }
 
 .character-card {
@@ -320,62 +433,96 @@ body {
     border-radius: var(--border-radius);
     overflow: hidden;
     box-shadow: var(--shadow);
+    transition: var(--transition);
+}
+
+.character-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
 }
 
 .character-card__image {
-    height: 150px;
-    background: #e0e0e0;
+    height: 180px;
+    background: linear-gradient(135deg, #e0e0e0 0%, #f0f0f0 100%);
     display: flex;
     align-items: center;
     justify-content: center;
+    overflow: hidden;
+    position: relative;
 }
 
 .character-card__image img {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    transition: var(--transition);
+}
+
+.character-card:hover .character-card__image img {
+    transform: scale(1.05);
+}
+
+.character-card__image .btn--success {
+    position: absolute;
+    bottom: 0.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 0.3rem 0.8rem;
+    font-size: 0.8rem;
+    z-index: 2;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.character-card__image .btn--success:hover {
+    transform: translateX(-50%) translateY(-2px);
 }
 
 .character-card__content {
-    padding: 1rem;
+    padding: 1.3rem;
+}
+
+.character-card__content h3 {
+    margin-bottom: 0.6rem;
+    font-size: 1.2rem;
+    color: var(--color-text);
 }
 
 .character-card__role {
     color: var(--color-primary);
-    font-weight: 500;
-    margin-bottom: 0.5rem;
-}
-
-.character-card__stats {
-    list-style: none;
-    font-size: 0.9rem;
-    color: var(--color-text-muted);
-    margin-bottom: 0.8rem;
-}
-
-.character-card__stats li {
-    margin-bottom: 0.2rem;
-}
-
-.character-card__notes {
-    font-size: 0.9rem;
-    color: var(--color-text-muted);
+    font-weight: 600;
     margin-bottom: 1rem;
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .character-card__actions {
     display: flex;
-    gap: 0.5rem;
+    gap: 0.6rem;
+    margin-top: 0.8rem;
+}
+
+.character-card__actions .btn {
+    flex: 1;
+    font-size: 0.85rem;
+    padding: 0.4rem 0.6rem;
 }
 
 /* ===== Формы ===== */
 .form-container {
     background: var(--color-card);
-    padding: 2rem;
+    padding: 2.5rem;
     border-radius: var(--border-radius);
     box-shadow: var(--shadow);
     max-width: 700px;
-    margin: 0 auto;
+    margin: 2rem auto;
+}
+
+.form-container h1 {
+    margin-bottom: 2rem;
+    color: var(--color-text);
+    font-size: 1.8rem;
+    text-align: center;
 }
 
 .form-group {
@@ -385,32 +532,94 @@ body {
 .form-group label {
     display: block;
     margin-bottom: 0.5rem;
-    font-weight: 500;
+    font-weight: 600;
+    color: var(--color-text);
 }
 
 .form-group .required {
     color: var(--color-danger);
+    margin-left: 0.2rem;
 }
 
 .form-group small.help-text {
     display: block;
-    margin-top: 0.3rem;
+    margin-top: 0.4rem;
     color: var(--color-text-muted);
     font-size: 0.85rem;
+}
+
+.form-group input[type="text"],
+.form-group input[type="number"],
+.form-group input[type="date"],
+.form-group input[type="file"],
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: var(--transition);
+    font-family: inherit;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.1);
+}
+
+.form-group input[type="file"] {
+    padding: 0.5rem;
+    border: 2px dashed #e0e0e0;
+    background: #fafafa;
+}
+
+.form-group input[type="file"]:hover {
+    border-color: var(--color-primary);
+    background: #f5f5f5;
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+.form-group input[type="checkbox"] {
+    width: auto;
+    margin-right: 0.5rem;
+    transform: scale(1.2);
 }
 
 .error-list {
     color: var(--color-danger);
     font-size: 0.9rem;
-    margin-top: 0.3rem;
+    margin-top: 0.4rem;
+    padding-left: 0.5rem;
+    border-left: 3px solid var(--color-danger);
+}
+
+.error-list ul {
+    margin: 0;
+    padding-left: 1.2rem;
+}
+
+.error-list li {
+    margin-bottom: 0.2rem;
 }
 
 .form-actions {
     display: flex;
     gap: 1rem;
-    margin-top: 2rem;
+    margin-top: 2.5rem;
     padding-top: 1.5rem;
-    border-top: 1px solid #e0e0e0;
+    border-top: 2px solid #e0e0e0;
+}
+
+.form-actions .btn {
+    flex: 1;
 }
 
 /* ===== Подтверждение удаления ===== */
@@ -426,11 +635,12 @@ body {
 
 .confirm-dialog h1 {
     margin-bottom: 1rem;
-    color: var(--color-danger);
+    color: var(--color-text);
 }
 
 .confirm-dialog p {
     margin-bottom: 1.5rem;
+    line-height: 1.6;
 }
 
 /* ===== Пагинация ===== */
@@ -456,6 +666,7 @@ body {
     padding: 1rem;
     color: var(--color-text-muted);
     justify-content: center;
+    margin: 1rem 0;
 }
 
 .loading.hidden {
@@ -472,56 +683,199 @@ body {
 }
 
 @keyframes spin {
-    to { transform: rotate(360deg); }
-}
-
-/* ===== Адаптивность ===== */
-@media (max-width: 768px) {
-    .navbar__content {
-        flex-direction: column;
-        gap: 1rem;
-        padding: 1rem;
-    }
-    
-    .navbar__menu {
-        width: 100%;
-        justify-content: center;
-    }
-    
-    .game-detail__header {
-        grid-template-columns: 1fr;
-        text-align: center;
-    }
-    
-    .game-detail__meta {
-        grid-template-columns: 1fr;
-    }
-    
-    .game-detail__actions {
-        justify-content: center;
-    }
-    
-    .games-grid,
-    .characters-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .form-actions {
-        flex-direction: column;
-    }
-    
-    .btn--large {
-        width: 100%;
+    to {
+        transform: rotate(360deg);
     }
 }
 
 /* ===== Утилиты ===== */
-.text-muted { color: var(--color-text-muted); }
-.hidden { display: none !important; }
-.no-results { 
-    text-align: center; 
-    padding: 3rem; 
+.text-muted {
+    color: var(--color-text-muted);
+}
+
+.hidden {
+    display: none !important;
+}
+
+.no-results {
+    text-align: center;
+    padding: 3rem;
     color: var(--color-text-muted);
     background: var(--color-card);
     border-radius: var(--border-radius);
+    grid-column: 1 / -1;
 }
+
+/* ===== Адаптивность ===== */
+@media (max-width: 992px) {
+    .game-detail__header {
+        grid-template-columns: 1fr;
+        text-align: center;
+    }
+
+    .game-detail__image {
+        max-width: 300px;
+        margin: 0 auto;
+    }
+
+    .game-detail__meta {
+        grid-template-columns: 1fr;
+    }
+
+    .game-detail__actions {
+        justify-content: center;
+    }
+}
+
+@media (max-width: 768px) {
+    .navbar__content {
+        flex-wrap: wrap;
+    }
+
+    .navbar__search {
+        order: 3;
+        max-width: 100%;
+        margin: 0.5rem 0 0;
+        width: 100%;
+    }
+
+    .navbar__menu {
+        order: 2;
+    }
+
+    .games-grid,
+    .characters-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .form-container {
+        padding: 1.5rem;
+        margin: 1rem;
+    }
+
+    .form-actions {
+        flex-direction: column;
+    }
+
+    .form-actions .btn,
+    .btn--large {
+        width: 100%;
+    }
+
+    .game-detail__header {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+        padding: 1.5rem;
+    }
+
+    .game-detail__image {
+        max-width: 100%;
+    }
+
+    .game-detail__info h1 {
+        font-size: 1.8rem;
+        text-align: center;
+    }
+
+    .game-detail__meta {
+        grid-template-columns: 1fr;
+    }
+
+    .game-detail__actions {
+        justify-content: center;
+    }
+
+    .modal__content {
+        max-height: 95vh;
+    }
+
+
+    .character-card__image .btn--success {
+        font-size: 0.75rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .navbar__content {
+        padding: 0.8rem 15px;
+    }
+
+    .navbar__logo {
+        font-size: 1.3rem;
+    }
+
+    .game-detail__header {
+        padding: 1.5rem;
+    }
+
+    .game-card__actions,
+    .character-card__actions {
+        flex-direction: column;
+    }
+
+    .game-card__actions .btn,
+    .character-card__actions .btn {
+        width: 100%;
+    }
+}
+
+
+
+/* ===== Модальное окно и 3D-просмотр ===== */
+.modal {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    background: rgba(0, 0, 0, 0.85);
+    display: flex !important; /* !important чтобы перебить .hidden */
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    padding: 1rem;
+}
+
+.modal.hidden {
+    display: none !important;
+}
+
+.modal__content {
+    background: var(--color-card);
+    border-radius: var(--border-radius);
+    width: 90vw;
+    height: 90vh;
+    max-width: 1400px;
+    max-height: 900px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+.modal__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid #e0e0e0;
+    flex-shrink: 0;
+}
+
+.modal__header h3 { margin: 0; font-size: 1.2rem; color: var(--color-text); }
+
+.modal__close {
+    background: none; border: none; font-size: 2rem; cursor: pointer;
+    color: var(--color-text-muted); width: 36px; height: 36px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 50%; transition: 0.2s;
+}
+.modal__close:hover { color: var(--color-danger); background: rgba(214,48,49,0.1); }
+
+.modal__body {
+    flex: 1;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: transparent;
+}
+

@@ -33,15 +33,39 @@ class LibraryGameForm(forms.ModelForm):
 class Character3DForm(forms.ModelForm):
     class Meta:
         model = Character3D
-        fields = ['name', 'game', 'role', 'polygon_count', 'has_rig', 
-                  'texture_resolution', 'thumbnail', 'notes']
+        fields = ['name', 'game', 'model_file', 'thumbnail', 'description']
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Имя персонажа'}),
             'game': forms.Select(attrs={'class': 'form-control'}),
-            'role': forms.Select(attrs={'class': 'form-control'}),
-            'polygon_count': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '50000'}),
-            'has_rig': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
-            'texture_resolution': forms.Select(attrs={'class': 'form-control'}),
-            'thumbnail': forms.ClearableFileInput(attrs={'class': 'form-control'}),
-            'notes': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Заметки...'}),
+            'model_file': forms.ClearableFileInput(attrs={
+                'class': 'form-control',
+                'accept': '.gltf,.glb,.obj,.fbx'
+            }),
+            'thumbnail': forms.ClearableFileInput(attrs={
+                'class': 'form-control',
+                'accept': 'image/*'
+            }),
+            'description': forms.Textarea(attrs={
+                'class': 'form-control', 
+                'rows': 4, 
+                'placeholder': 'Описание персонажа...'
+            }),
         }
+        labels = {
+            'name': 'Имя персонажа',
+            'game': 'Игра',
+            'model_file': 'Файл 3D-модели',
+            'thumbnail': 'Изображение превью',
+            'description': 'Описание', 
+        }
+        help_texts = {
+            'model_file': 'Поддерживаемые форматы: GLB, GLTF, OBJ, FBX',
+            'thumbnail': 'Рекомендуемый размер: 800×600 px',
+            'description': 'Краткое описание персонажа, его особенности и роль в игре',
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.initial.get('game') or (self.instance.pk and self.instance.game_id):
+            self.fields['game'].widget.attrs['disabled'] = True
+            self.fields['game'].required = False

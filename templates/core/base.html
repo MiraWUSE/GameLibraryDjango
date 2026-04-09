@@ -9,13 +9,23 @@
     {% block extra_css %}{% endblock %}
 </head>
 <body>
-    <!-- Навигация -->
+    <!-- Навигация с поиском -->
     <header class="navbar">
         <div class="container navbar__content">
-            <a href="{% url 'core:game_list' %}" class="navbar__logo">🎮 GameLib</a>
+            <a href="{% url 'core:game_list' %}" class="navbar__logo">GameLib</a>
+            
+            <!-- Поиск в шапке -->
+            <form id="header-search" class="navbar__search" method="get" action="{% url 'core:game_list' %}">
+                <input type="search" name="search" class="form-control navbar__search-input" 
+                       placeholder="Поиск по названию..." 
+                       value="{{ current_filters.search|default:'' }}"
+                       autocomplete="off">
+                <button type="submit" class="btn btn--small btn--primary">Найти</button>
+            </form>
+            
             <nav class="navbar__menu">
                 <a href="{% url 'core:game_list' %}">Все игры</a>
-                <a href="{% url 'core:game_create' %}" class="btn btn--primary">+ Добавить игру</a>
+                <a href="{% url 'core:game_create' %}" class="btn btn--primary">Добавить игру</a>
             </nav>
         </div>
     </header>
@@ -26,7 +36,7 @@
             {% for message in messages %}
                 <div class="alert alert--{{ message.tags }}">
                     {{ message }}
-                    <button class="alert__close" onclick="this.parentElement.remove()">×</button>
+                    <button class="alert__close" onclick="this.parentElement.remove()">x</button>
                 </div>
             {% endfor %}
         {% endif %}
@@ -40,7 +50,7 @@
     <!-- Футер -->
     <footer class="footer">
         <div class="container">
-            <p>© 2024 Game Library • Django Project</p>
+            <p>GameLib</p>
         </div>
     </footer>
 

@@ -9,21 +9,6 @@ class EngineChoices(models.TextChoices):
     CUSTOM = 'Custom', 'Другой/Кастомный'
 
 
-class RoleChoices(models.TextChoices):
-    PROTAGONIST = 'protagonist', 'Главный герой'
-    COMPANION = 'companion', 'Напарник'
-    ENEMY = 'enemy', 'Противник'
-    BOSS = 'boss', 'Босс'
-    NPC = 'npc', 'NPC'
-
-
-class TextureChoices(models.TextChoices):
-    K1 = '1K', '1024x1024'
-    K2 = '2K', '2048x2048'
-    K4 = '4K', '4096x4096'
-    K8 = '8K', '8192x8192'
-
-
 class LibraryGame(models.Model):
     title = models.CharField('Название игры', max_length=150)
     developer = models.CharField('Разработчик', max_length=100, blank=True)
@@ -44,18 +29,18 @@ class LibraryGame(models.Model):
     def __str__(self):
         return self.title
 
+    def get_absolute_url(self):
+        from django.urls import reverse
+        return reverse('core:game_detail', kwargs={'pk': self.pk})
+
 
 class Character3D(models.Model):
     name = models.CharField('Имя персонажа', max_length=100)
-    game = models.ForeignKey(LibraryGame, on_delete=models.CASCADE, related_name='characters',
-                             verbose_name='Игра')
-    role = models.CharField('Роль', max_length=20, choices=RoleChoices.choices)
-    polygon_count = models.PositiveIntegerField('Количество полигонов')
-    has_rig = models.BooleanField('Есть риг (скелет)', default=False)
-    texture_resolution = models.CharField('Разрешение текстур', max_length=10, choices=TextureChoices.choices)
+    game = models.ForeignKey(LibraryGame, on_delete=models.CASCADE, related_name='characters', verbose_name='Игра')
     created_date = models.DateField('Дата создания/добавления', auto_now_add=True)
     thumbnail = models.ImageField('Превью модели', upload_to='characters/thumbnails/', blank=True, null=True)
-    notes = models.TextField('Заметки', blank=True)
+    model_file = models.FileField('3D модель', upload_to='characters/models/', blank=True, null=True)
+    description = models.TextField('Описание', blank=True)
 
     class Meta:
         verbose_name = '3D-персонаж'
@@ -63,4 +48,4 @@ class Character3D(models.Model):
         ordering = ['-created_date', 'name']
 
     def __str__(self):
-        return f"{self.name} ({self.get_role_display()})"
+        return self.name

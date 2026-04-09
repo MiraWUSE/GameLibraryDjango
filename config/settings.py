@@ -11,16 +11,14 @@ SECRET_KEY = 'django-insecure-change-this-in-production-!!!'
 
 # === УСТАНОВЛЕННЫЕ ПРИЛОЖЕНИЯ ===
 INSTALLED_APPS = [
-    # Стандартные приложения Django
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    
-    # Наши приложения
-    'core',  # ← Приложение с играми и 3D-персонажами
+    'django.contrib.humanize', 
+    'core',
 ]
 
 # === MIDDLEWARE ===

@@ -4,74 +4,40 @@
 
 {% block content %}
 <div class="page-header">
-    <h1>🎮 Моя коллекция игр</h1>
+    <h1>Моя коллекция игр</h1>
     <p class="text-muted">Всего игр: {{ page_obj.paginator.count }}</p>
 </div>
 
-<!-- Фильтры и поиск -->
-<aside class="filters">
-    <form id="filter-form" method="get" action="{% url 'core:game_list' %}">
-        <div class="filter-group">
-            <label>🔍 Поиск</label>
-            <input type="search" name="search" class="form-control" 
-                   placeholder="Название или разработчик..." 
-                   value="{{ current_filters.search|default:'' }}">
-        </div>
-
-        <div class="filter-group">
-            <label>⚙️ Движок</label>
-            <select name="engine" class="form-control">
-                <option value="">Все движки</option>
-                {% for value, label in engines %}
-                    <option value="{{ value }}" {% if current_filters.engine == value %}selected{% endif %}>
-                        {{ label }}
-                    </option>
-                {% endfor %}
-            </select>
-        </div>
-
-        <div class="filter-group">
-            <label>⭐ Мин. рейтинг</label>
-            <input type="number" name="min_rating" class="form-control" 
-                   min="0" max="10" step="0.1" placeholder="0.0"
-                   value="{{ current_filters.min_rating|default:'' }}">
-        </div>
-
-        <button type="submit" class="btn btn--primary">Применить</button>
-        <button type="button" id="reset-filters" class="btn btn--secondary">Сбросить</button>
-    </form>
-
-    <!-- Индикатор загрузки -->
-    <div id="loading" class="loading hidden">
-        <div class="spinner"></div>
-        <span>Загрузка...</span>
-    </div>
-</aside>
+<!-- Индикатор загрузки для AJAX -->
+<div id="loading" class="loading hidden">
+    <div class="spinner"></div>
+    <span>Поиск...</span>
+</div>
 
 <!-- Список игр -->
 <section class="games-grid" id="games-container">
     {% for game in games %}
-        <article class="game-card" data-game-id="{{ game.id }}">
-            <div class="game-card__image">
-                {% if game.logo %}
-                    <img src="{{ game.logo.url }}" alt="{{ game.title }}">
-                {% else %}
-                    <div class="no-image">🎮</div>
-                {% endif %}
+    <article class="game-card" data-game-id="{{ game.id }}">
+        <div class="game-card__image">
+            {% if game.logo %}
+            <img src="{{ game.logo.url }}" alt="{{ game.title }}">
+            {% else %}
+            <div class="no-image">нет картинки</div>
+            {% endif %}
+        </div>
+        <div class="game-card__content">
+            <h3><a href="{% url 'core:game_detail' game.pk %}" class="game-card__title">{{ game.title }}</a></h3>
+            <p class="game-card__meta">{{ game.get_engine_display }} • {{ game.release_year }}</p>
+            <p class="game-card__rating">Оценка: {{ game.rating }}/10</p>
+            <p class="game-card__progress">Прогресс: {{ game.save_progress }}%</p>
+            <div class="game-card__actions">
+                <a href="{% url 'core:game_update' game.pk %}" class="btn btn--small btn--secondary">Редактировать</a>
+                <a href="{% url 'core:game_delete' game.pk %}" class="btn btn--small btn--danger">Удалить</a>
             </div>
-            <div class="game-card__content">
-                <h3><a href="{% url 'core:game_detail' game.pk %}">{{ game.title }}</a></h3>
-                <p class="game-card__meta">{{ game.get_engine_display }} • {{ game.release_year }}</p>
-                <p class="game-card__rating">⭐ {{ game.rating }}/10</p>
-                <p class="game-card__progress">Прогресс: {{ game.save_progress }}%</p>
-                <div class="game-card__actions">
-                    <a href="{% url 'core:game_update' game.pk %}" class="btn btn--small">✏️</a>
-                    <a href="{% url 'core:game_delete' game.pk %}" class="btn btn--small btn--danger">🗑️</a>
-                </div>
-            </div>
-        </article>
+        </div>
+    </article>
     {% empty %}
-        <p class="no-results">Коллекция пуста. <a href="{% url 'core:game_create' %}">Добавь первую игру!</a></p>
+    <p class="no-results">Коллекция пуста. <a href="{% url 'core:game_create' %}">Добавь первую игру!</a></p>
     {% endfor %}
 </section>
 
@@ -79,15 +45,19 @@
 {% if page_obj.has_other_pages %}
 <nav class="pagination">
     {% if page_obj.has_previous %}
-        <a href="?page=1{% for key, value in current_filters.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" class="btn btn--secondary">« Первая</a>
-        <a href="?page={{ page_obj.previous_page_number }}{% for key, value in current_filters.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" class="btn btn--secondary">‹ Назад</a>
+    <a href="?page=1{% if current_filters.search %}&search={{ current_filters.search }}{% endif %}"
+        class="btn btn--secondary">Первая</a>
+    <a href="?page={{ page_obj.previous_page_number }}{% if current_filters.search %}&search={{ current_filters.search }}{% endif %}"
+        class="btn btn--secondary">Назад</a>
     {% endif %}
-    
+
     <span class="pagination__info">Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}</span>
-    
+
     {% if page_obj.has_next %}
-        <a href="?page={{ page_obj.next_page_number }}{% for key, value in current_filters.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" class="btn btn--secondary">Вперёд ›</a>
-        <a href="?page={{ page_obj.paginator.num_pages }}{% for key, value in current_filters.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" class="btn btn--secondary">Последняя »</a>
+    <a href="?page={{ page_obj.next_page_number }}{% if current_filters.search %}&search={{ current_filters.search }}{% endif %}"
+        class="btn btn--secondary">Вперёд</a>
+    <a href="?page={{ page_obj.paginator.num_pages }}{% if current_filters.search %}&search={{ current_filters.search }}{% endif %}"
+        class="btn btn--secondary">Последняя</a>
     {% endif %}
 </nav>
 {% endif %}
@@ -95,9 +65,8 @@
 
 {% block extra_js %}
 <script>
-    // Подключаем скрипт фильтрации
-    document.addEventListener('DOMContentLoaded', function() {
-        initAjaxFilter();
+    document.addEventListener('DOMContentLoaded', function () {
+        initAjaxSearch();
     });
 </script>
 {% endblock %}
