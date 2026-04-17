@@ -789,7 +789,6 @@ body {
         max-height: 95vh;
     }
 
-
     .character-card__image .btn--success {
         font-size: 0.75rem;
     }
@@ -819,19 +818,19 @@ body {
     }
 }
 
-
-
 /* ===== Модальное окно и 3D-просмотр ===== */
 .modal {
     position: fixed;
-    top: 0; left: 0;
-    width: 100vw; height: 100vh;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
     background: rgba(0, 0, 0, 0.85);
-    display: flex !important; /* !important чтобы перебить .hidden */
+    display: flex !important;
     align-items: center;
     justify-content: center;
     z-index: 9999;
-    padding: 1rem;
+    padding: 2rem 4rem;
 }
 
 .modal.hidden {
@@ -842,9 +841,9 @@ body {
     background: var(--color-card);
     border-radius: var(--border-radius);
     width: 90vw;
-    height: 90vh;
+    height: 95vh;
     max-width: 1400px;
-    max-height: 900px;
+    max-height: none;
     display: flex;
     flex-direction: column;
     overflow: hidden;
@@ -860,15 +859,31 @@ body {
     flex-shrink: 0;
 }
 
-.modal__header h3 { margin: 0; font-size: 1.2rem; color: var(--color-text); }
+.modal__header h3 {
+    margin: 0;
+    font-size: 1.2rem;
+    color: var(--color-text);
+}
 
 .modal__close {
-    background: none; border: none; font-size: 2rem; cursor: pointer;
-    color: var(--color-text-muted); width: 36px; height: 36px;
-    display: flex; align-items: center; justify-content: center;
-    border-radius: 50%; transition: 0.2s;
+    background: none;
+    border: none;
+    font-size: 2rem;
+    cursor: pointer;
+    color: var(--color-text-muted);
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: 0.2s;
 }
-.modal__close:hover { color: var(--color-danger); background: rgba(214,48,49,0.1); }
+
+.modal__close:hover {
+    color: var(--color-danger);
+    background: rgba(214, 48, 49, 0.1);
+}
 
 .modal__body {
     flex: 1;
@@ -879,3 +894,15 @@ body {
     background: transparent;
 }
 
+/* Адаптив для мобильных */
+@media (max-width: 768px) {
+    .modal {
+        padding: 1rem 1.5rem;
+    }
+
+    .modal__content {
+        width: 98vw;
+        height: 95vh;
+        max-width: none;
+    }
+}

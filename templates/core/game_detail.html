@@ -85,9 +85,10 @@
     </div>
 </div>
 
-<!-- Three.js -->
+<!-- Three.js + OrbitControls -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -96,7 +97,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const viewerContainer = document.getElementById('3d-viewer');
     const modalTitle = document.getElementById('modal-title');
     
-    let scene, camera, renderer, animationId;
+    let scene, camera, renderer, animationId, controls;
     
     document.querySelectorAll('.view-3d-btn').forEach(btn => {
         btn.addEventListener('click', function() {
@@ -119,7 +120,6 @@ document.addEventListener('DOMContentLoaded', function() {
     function init3DViewer(modelUrl) {
         cleanup3DViewer();
         
-        // Проверка контейнера
         if (!viewerContainer) {
             console.error('❌ Контейнер 3D-вьюера не найден');
             return;
@@ -138,11 +138,9 @@ document.addEventListener('DOMContentLoaded', function() {
         renderer.setSize(width, height);
         renderer.setPixelRatio(window.devicePixelRatio);
         
-        // ✅ Очищаем и добавляем canvas
         viewerContainer.innerHTML = '';
         viewerContainer.appendChild(renderer.domElement);
         
-        // ✅ Создаём индикатор загрузки и сохраняем ссылку
         const loadingEl = document.createElement('div');
         loadingEl.className = '3d-viewer__loading';
         loadingEl.textContent = 'Загрузка...';
@@ -154,64 +152,62 @@ document.addEventListener('DOMContentLoaded', function() {
         dirLight.position.set(5, 10, 7);
         scene.add(dirLight);
         
-        // Загрузка модели
+        // ✅ OrbitControls для зума и вращения
+        controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+        controls.screenSpacePanning = false;
+        controls.minDistance = 1;
+        controls.maxDistance = 20;
+        
         const loader = new THREE.GLTFLoader();
         loader.load(
             modelUrl,
             function(gltf) {
-                // Центрирование
                 const box = new THREE.Box3().setFromObject(gltf.scene);
                 const center = box.getCenter(new THREE.Vector3());
                 const size = box.getSize(new THREE.Vector3());
+                
                 gltf.scene.position.set(-center.x, -center.y, -center.z);
                 
-                // Масштаб
                 const maxDim = Math.max(size.x, size.y, size.z);
                 const fov = camera.fov * (Math.PI / 180);
                 camera.position.z = Math.abs(maxDim / 2 / Math.tan(fov / 2)) * 1.5;
                 
+                controls.target.set(0, 0, 0);
+                controls.update();
+                
                 scene.add(gltf.scene);
                 
-                // ✅ Удаляем через нашу ссылку (без querySelector!)
                 if (loadingEl && loadingEl.parentNode) {
                     loadingEl.parentNode.removeChild(loadingEl);
                 }
                 animate();
             },
             function(xhr) {
-                // ✅ Обновляем через ссылку
                 const percent = (xhr.loaded / xhr.total * 100).toFixed(0);
                 loadingEl.textContent = 'Загрузка: ' + percent + '%';
             },
             function(error) {
                 console.error('❌ Ошибка:', error);
-                // ✅ Обработка ошибки через ссылку
                 loadingEl.textContent = 'Ошибка: используйте формат .glb';
                 loadingEl.style.color = '#d63031';
             }
         );
         
-        // Вращение мышью
-        let isDragging = false, prev = {x: 0, y: 0};
-        renderer.domElement.addEventListener('mousedown', e => { isDragging = true; prev = {x: e.offsetX, y: e.offsetY}; });
-        renderer.domElement.addEventListener('mousemove', e => {
-            if (isDragging) {
-                scene.rotation.y += (e.offsetX - prev.x) * 0.01;
-                scene.rotation.x += (e.offsetY - prev.y) * 0.01;
-                prev = {x: e.offsetX, y: e.offsetY};
-            }
-        });
-        renderer.domElement.addEventListener('mouseup', () => isDragging = false);
-        renderer.domElement.addEventListener('mouseleave', () => isDragging = false);
-        
         function animate() {
             animationId = requestAnimationFrame(animate);
+            controls.update();
             renderer.render(scene, camera);
         }
     }
     
     function cleanup3DViewer() {
         if (animationId) cancelAnimationFrame(animationId);
+        if (controls) {
+            controls.dispose();
+            controls = null;
+        }
         if (renderer) {
             renderer.dispose();
             if (renderer.domElement?.parentNode) {
