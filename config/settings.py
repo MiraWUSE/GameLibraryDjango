@@ -4,8 +4,10 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 DEBUG = True
-
 ALLOWED_HOSTS = []
+
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '0.0.0.0', '.ngrok-free.dev', '.ngrok.app', '*']
+CSRF_TRUSTED_ORIGINS = ['https://*.ngrok-free.dev', 'https://*.ngrok.app']
 
 SECRET_KEY = 'django-insecure-change-this-in-production-!!!'
 
@@ -19,6 +21,15 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.humanize', 
     'core',
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    'https://*.localhost.run',
+    'https://*.lhr.life',      # домен localhost.run
+    'https://*.serveo.net',
+    'https://*.trycloudflare.com',
+    'https://*.ngrok-free.dev',
+    'https://*.ngrok.app',
 ]
 
 # === MIDDLEWARE ===

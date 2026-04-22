@@ -16,3 +16,26 @@ staticfiles/
 
 .DS_Store
 Thumbs.db
+
+
+# --- Docker ---
+.docker/
+docker-compose.override.yml
+
+# --- IDE и редакторы ---
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# --- Python ---
+*.egg-info/
+.installed.cfg
+.Python
+build/
+dist/
+
+# --- OS ---
+ehthumbs.db
+Desktop.ini
