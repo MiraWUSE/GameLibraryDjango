@@ -1,10 +1,12 @@
 {% extends 'core/base.html' %}
 {% load humanize %}
 
+<!-- Заголовок вкладки = название игры -->
 {% block title %}{{ game.title }}{% endblock %}
 
 {% block content %}
 <article class="game-detail">
+    <!-- Шапка: обложка + основная информация -->
     <div class="game-detail__header">
         <div class="game-detail__image">
             {% if game.logo %}
@@ -16,6 +18,8 @@
         <div class="game-detail__info">
             <h1>{{ game.title }}</h1>
             <p class="text-muted">{{ game.developer }} • {{ game.release_year }}</p>
+            
+            <!-- Мета-информация: движок, оценка, прогресс -->
             <div class="game-detail__meta">
                 <span><strong>Движок:</strong> {{ game.get_engine_display }}</span>
                 <span><strong>Оценка:</strong> {{ game.rating }}/10</span>
@@ -24,14 +28,18 @@
                 <span><strong>Куплено:</strong> {{ game.purchase_date|date:"d.m.Y" }}</span>
                 {% endif %}
             </div>
+            
+            <!-- Кнопки действий: редактировать, удалить, добавить персонажа -->
             <div class="game-detail__actions">
                 <a href="{% url 'core:game_update' game.pk %}" class="btn btn--primary">Редактировать игру</a>
                 <a href="{% url 'core:game_delete' game.pk %}" class="btn btn--danger">Удалить игру</a>
+                <!-- Передаём ID игры в параметре URL для создания персонажа -->
                 <a href="{% url 'core:character_create' %}?game={{ game.pk }}" class="btn btn--success">Добавить 3D-персонажа</a>
             </div>
         </div>
     </div>
 
+    <!-- Секция персонажей -->
     <section class="characters-section">
         <h2>3D-персонажи ({{ characters.count }})</h2>
         {% if characters %}
@@ -44,6 +52,7 @@
                     {% else %}
                     <div class="no-image">нет картинки</div>
                     {% endif %}
+                    <!-- Кнопка просмотра 3D-модели (если файл загружен) -->
                     {% if character.model_file %}
                     <button type="button" 
                             class="btn btn--small btn--success view-3d-btn"
@@ -65,12 +74,13 @@
             {% endfor %}
         </div>
         {% else %}
+        <!-- Если персонажей нет — ссылка на создание -->
         <p>Пока нет персонажей. <a href="{% url 'core:character_create' %}?game={{ game.pk }}">Добавить первого?</a></p>
         {% endif %}
     </section>
 </article>
 
-<!-- Модальное окно -->
+<!-- Модальное окно для 3D-просмотра (скрыто по умолчанию) -->
 <div id="modal-3d" class="modal hidden">
     <div class="modal__content">
         <div class="modal__header">
@@ -85,31 +95,35 @@
     </div>
 </div>
 
-<!-- Three.js + OrbitControls -->
+<!-- Подключаем Three.js и необходимые модули -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Элементы модального окна
     const modal = document.getElementById('modal-3d');
     const modalClose = document.getElementById('modal-close');
     const viewerContainer = document.getElementById('3d-viewer');
     const modalTitle = document.getElementById('modal-title');
     
+    // Глобальные переменные Three.js
     let scene, camera, renderer, animationId, controls;
     
+    // Открытие модалки при клике на "Просмотр 3D"
     document.querySelectorAll('.view-3d-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             modalTitle.textContent = this.dataset.characterName;
             modal.classList.remove('hidden');
-            init3DViewer(this.dataset.modelUrl);
+            init3DViewer(this.dataset.modelUrl); // Запуск вьюера с URL модели
         });
     });
     
+    // Закрытие модалки
     function closeModal() {
         modal.classList.add('hidden');
-        cleanup3DViewer();
+        cleanup3DViewer(); // Очистка сцены и памяти
     }
     modalClose.addEventListener('click', closeModal);
     modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
@@ -117,6 +131,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (e.key === 'Escape' && !modal.classList.contains('hidden')) closeModal();
     });
     
+    // Инициализация Three.js сцены
     function init3DViewer(modelUrl) {
         cleanup3DViewer();
         
@@ -125,6 +140,7 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         
+        // Сцена, камера, рендерер
         scene = new THREE.Scene();
         scene.background = new THREE.Color(0x1a1a2e);
         
@@ -141,18 +157,19 @@ document.addEventListener('DOMContentLoaded', function() {
         viewerContainer.innerHTML = '';
         viewerContainer.appendChild(renderer.domElement);
         
+        // Индикатор загрузки
         const loadingEl = document.createElement('div');
         loadingEl.className = '3d-viewer__loading';
         loadingEl.textContent = 'Загрузка...';
         viewerContainer.appendChild(loadingEl);
         
-        // Свет
+        // Освещение
         scene.add(new THREE.AmbientLight(0xffffff, 0.6));
         const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
         dirLight.position.set(5, 10, 7);
         scene.add(dirLight);
         
-        // ✅ OrbitControls для зума и вращения
+        // ✅ OrbitControls: вращение и зум мышкой
         controls = new THREE.OrbitControls(camera, renderer.domElement);
         controls.enableDamping = true;
         controls.dampingFactor = 0.05;
@@ -160,16 +177,19 @@ document.addEventListener('DOMContentLoaded', function() {
         controls.minDistance = 1;
         controls.maxDistance = 20;
         
+        // Загрузка модели (.glb/.gltf)
         const loader = new THREE.GLTFLoader();
         loader.load(
             modelUrl,
             function(gltf) {
+                // Центрируем модель в сцене
                 const box = new THREE.Box3().setFromObject(gltf.scene);
                 const center = box.getCenter(new THREE.Vector3());
                 const size = box.getSize(new THREE.Vector3());
                 
                 gltf.scene.position.set(-center.x, -center.y, -center.z);
                 
+                // Автоматический зум камеры под размер модели
                 const maxDim = Math.max(size.x, size.y, size.z);
                 const fov = camera.fov * (Math.PI / 180);
                 camera.position.z = Math.abs(maxDim / 2 / Math.tan(fov / 2)) * 1.5;
@@ -182,19 +202,22 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (loadingEl && loadingEl.parentNode) {
                     loadingEl.parentNode.removeChild(loadingEl);
                 }
-                animate();
+                animate(); // Запуск анимационного цикла
             },
             function(xhr) {
+                // Прогресс загрузки
                 const percent = (xhr.loaded / xhr.total * 100).toFixed(0);
                 loadingEl.textContent = 'Загрузка: ' + percent + '%';
             },
             function(error) {
+                // Ошибка загрузки
                 console.error('❌ Ошибка:', error);
                 loadingEl.textContent = 'Ошибка: используйте формат .glb';
                 loadingEl.style.color = '#d63031';
             }
         );
         
+        // Анимационный цикл
         function animate() {
             animationId = requestAnimationFrame(animate);
             controls.update();
@@ -202,6 +225,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
+    // Очистка ресурсов при закрытии
     function cleanup3DViewer() {
         if (animationId) cancelAnimationFrame(animationId);
         if (controls) {
@@ -217,6 +241,7 @@ document.addEventListener('DOMContentLoaded', function() {
         scene = camera = renderer = null;
     }
     
+    // Адаптация под изменение размера окна
     window.addEventListener('resize', () => {
         if (camera && renderer && !modal.classList.contains('hidden')) {
             camera.aspect = viewerContainer.clientWidth / (viewerContainer.clientHeight || 400);

@@ -1,17 +1,22 @@
 {% extends 'core/base.html' %}
 
+<!-- Заголовок вкладки браузера -->
 {% block title %}Удалить персонажа{% endblock %}
 
 {% block content %}
 <div class="confirm-dialog">
     <h1>Удалить персонажа?</h1>
+    <!-- Имя персонажа из контекста (object) -->
     <p>Вы уверены, что хотите удалить персонажа <strong>"{{ object.name }}"</strong>?</p>
     <p class="text-muted">Это действие нельзя отменить.</p>
     
+    <!-- Форма удаления: POST + CSRF защита -->
     <form method="post">
         {% csrf_token %}
         <div class="form-actions">
+            <!-- Кнопка подтверждения удаляет запись -->
             <button type="submit" class="btn btn--danger btn--large">Да, удалить</button>
+            <!-- Возврат на страницу игры без удаления -->
             <a href="{% url 'core:game_detail' object.game.pk %}" class="btn btn--secondary">Отмена</a>
         </div>
     </form>

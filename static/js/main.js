@@ -1,5 +1,5 @@
 /**
- * AJAX-поиск игр по названию без перезагрузки
+ * Поиск игр по названию без перезагрузки страницы
  */
 function initAjaxSearch() {
     const searchForm = document.getElementById('header-search');
@@ -8,6 +8,7 @@ function initAjaxSearch() {
 
     if (!searchForm || !gamesContainer) return;
 
+    // Запрос новых результатов с сервера
     function fetchFilteredGames(params) {
         loadingIndicator.classList.remove('hidden');
         
@@ -25,7 +26,7 @@ function initAjaxSearch() {
             });
     }
 
-    // Debounce: ждём 300мс после последнего ввода
+    // Debounce: ждём 300мс после последнего ввода, чтобы не спамить запросами
     let searchTimeout;
     searchForm.addEventListener('input', (e) => {
         if (e.target.name === 'search') {
@@ -37,7 +38,7 @@ function initAjaxSearch() {
         }
     });
 
-    // Отправка формы по нажатию Enter или клику на кнопку
+    // Обработка отправки формы (Enter или кнопка)
     searchForm.addEventListener('submit', (e) => {
         e.preventDefault();
         const params = new URLSearchParams(new FormData(searchForm)).toString();
@@ -46,7 +47,7 @@ function initAjaxSearch() {
 }
 
 /**
- * Автозакрытие сообщений и инициализация
+ * Инициализация после загрузки DOM
  */
 document.addEventListener('DOMContentLoaded', function() {
     // Автозакрытие сообщений через 5 секунд
@@ -57,19 +58,19 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 5000);
     });
 
-    // Кнопка закрытия сообщений
+    // Кнопка закрытия сообщений вручную
     document.querySelectorAll('.alert__close').forEach(btn => {
         btn.addEventListener('click', function() {
             this.parentElement.remove();
         });
     });
 
-    // Инициализация поиска, если мы на странице списка
+    // Включаем поиск, если мы на странице со списком игр
     if (document.getElementById('games-container')) {
         initAjaxSearch();
     }
 
-    // Подтверждение удаления
+    // Подтверждение перед удалением
     document.querySelectorAll('a[href*="delete"]').forEach(link => {
         link.addEventListener('click', function(e) {
             if (!confirm('Вы уверены? Это действие нельзя отменить.')) {

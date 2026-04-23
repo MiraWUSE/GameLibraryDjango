@@ -1,7 +1,7 @@
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 
-
+# Варианты движков для выбора в формах и админке
 class EngineChoices(models.TextChoices):
     UNITY = 'Unity', 'Unity'
     UNREAL = 'Unreal Engine', 'Unreal Engine'
@@ -9,6 +9,7 @@ class EngineChoices(models.TextChoices):
     CUSTOM = 'Custom', 'Другой/Кастомный'
 
 
+# Модель игры в коллекции
 class LibraryGame(models.Model):
     title = models.CharField('Название игры', max_length=150)
     developer = models.CharField('Разработчик', max_length=100, blank=True)
@@ -24,7 +25,7 @@ class LibraryGame(models.Model):
     class Meta:
         verbose_name = 'Игра в коллекции'
         verbose_name_plural = 'Игры в коллекции'
-        ordering = ['-release_year', 'title']
+        ordering = ['-release_year', 'title']  # Сортировка: сначала новые
 
     def __str__(self):
         return self.title
@@ -34,6 +35,7 @@ class LibraryGame(models.Model):
         return reverse('core:game_detail', kwargs={'pk': self.pk})
 
 
+# Модель 3D-персонажа, привязанного к игре
 class Character3D(models.Model):
     name = models.CharField('Имя персонажа', max_length=100)
     game = models.ForeignKey(LibraryGame, on_delete=models.CASCADE, related_name='characters', verbose_name='Игра')
@@ -45,7 +47,7 @@ class Character3D(models.Model):
     class Meta:
         verbose_name = '3D-персонаж'
         verbose_name_plural = '3D-персонажи'
-        ordering = ['-created_date', 'name']
+        ordering = ['-created_date', 'name']  # Сортировка: сначала новые
 
     def __str__(self):
         return self.name

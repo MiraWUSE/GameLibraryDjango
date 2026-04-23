@@ -7,6 +7,7 @@ class LibraryGameForm(forms.ModelForm):
         model = LibraryGame
         fields = ['title', 'developer', 'engine', 'release_year', 'rating', 
                   'purchase_date', 'save_progress', 'logo']
+        # Стилизация полей и плейсхолдеры
         widgets = {
             'title': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Название игры'}),
             'developer': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Разработчик'}),
@@ -17,12 +18,14 @@ class LibraryGameForm(forms.ModelForm):
             'save_progress': forms.NumberInput(attrs={'class': 'form-control', 'min': '0', 'max': '100'}),
         }
 
+    # Валидация оценки (0–10)
     def clean_rating(self):
         rating = self.cleaned_data.get('rating')
         if rating and (rating < 0 or rating > 10):
             raise forms.ValidationError('Оценка должна быть от 0 до 10')
         return rating
 
+    # Валидация года выпуска
     def clean_release_year(self):
         year = self.cleaned_data.get('release_year')
         if year and (year < 1970 or year > 2030):
@@ -34,6 +37,7 @@ class Character3DForm(forms.ModelForm):
     class Meta:
         model = Character3D
         fields = ['name', 'game', 'model_file', 'thumbnail', 'description']
+        # Настройка типов полей и ограничений
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Имя персонажа'}),
             'game': forms.Select(attrs={'class': 'form-control'}),
@@ -51,6 +55,7 @@ class Character3DForm(forms.ModelForm):
                 'placeholder': 'Описание персонажа...'
             }),
         }
+        # Заголовки полей в форме
         labels = {
             'name': 'Имя персонажа',
             'game': 'Игра',
@@ -58,12 +63,14 @@ class Character3DForm(forms.ModelForm):
             'thumbnail': 'Изображение превью',
             'description': 'Описание', 
         }
+        # Подсказки под полями
         help_texts = {
             'model_file': 'Поддерживаемые форматы: GLB, GLTF, OBJ, FBX',
             'thumbnail': 'Рекомендуемый размер: 800×600 px',
             'description': 'Краткое описание персонажа, его особенности и роль в игре',
         }
 
+    # Блокировка поля "Игра" при редактировании существующего персонажа
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         if self.initial.get('game') or (self.instance.pk and self.instance.game_id):

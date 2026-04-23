@@ -1,20 +1,22 @@
 {% extends 'core/base.html' %}
 
+<!-- Динамический заголовок: создание или редактирование -->
 {% block title %}{% if form.instance.pk %}Редактировать{% else %}Добавить{% endif %} игру{% endblock %}
 
 {% block content %}
 <div class="form-container">
     <h1>{% if form.instance.pk %}Редактировать{% else %}Добавить{% endif %} игру</h1>
     
+    <!-- Форма с поддержкой загрузки файлов (логотип) -->
     <form method="post" enctype="multipart/form-data" class="game-form">
         {% csrf_token %}
         
+        <!-- Общие ошибки формы (не привязанные к полям) -->
         {% if form.non_field_errors %}
-            <div class="alert alert--error">
-                {{ form.non_field_errors }}
-            </div>
+            <div class="alert alert--error">{{ form.non_field_errors }}</div>
         {% endif %}
 
+        <!-- Автоматический вывод всех полей из формы -->
         {% for field in form %}
             <div class="form-group">
                 <label for="{{ field.id_for_label }}">
@@ -22,22 +24,24 @@
                     {% if field.field.required %}<span class="required">*</span>{% endif %}
                 </label>
                 
-                {{ field }}
+                {{ field }}  <!-- Рендеринг input/select/textarea из forms.py -->
                 
+                <!-- Подсказка под полем -->
                 {% if field.help_text %}
                     <small class="help-text">{{ field.help_text }}</small>
                 {% endif %}
                 
+                <!-- Ошибки валидации конкретного поля -->
                 {% if field.errors %}
-                    <div class="error-list">
-                        {{ field.errors }}
-                    </div>
+                    <div class="error-list">{{ field.errors }}</div>
                 {% endif %}
             </div>
         {% endfor %}
 
         <div class="form-actions">
+            <!-- Отправка формы -->
             <button type="submit" class="btn btn--primary btn--large">Сохранить</button>
+            <!-- Отмена: возврат на страницу игры или в общий список -->
             <a href="{% if form.instance.pk %}{% url 'core:game_detail' form.instance.pk %}{% else %}{% url 'core:game_list' %}{% endif %}" 
                class="btn btn--secondary">Отмена</a>
         </div>
